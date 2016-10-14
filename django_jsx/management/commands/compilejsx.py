@@ -9,8 +9,8 @@ from django.template.loaders.app_directories import get_app_template_dirs
 from django.core.management.base import BaseCommand, CommandError
 
 R_JSX = re.compile(r'\{% *jsx *%\}(.*?)\{% *endjsx *%\}', re.DOTALL)
-R_NAME = re.compile(r'<(\w+)')
-R_CTXVAR = re.compile(r'({)(\w*)(\.?)', re.DOTALL)
+R_COMPONENT = re.compile(r'<(\w+)')
+R_CTXVAR = re.compile(r'({)([A-Za-z]\w?)(\.?)', re.DOTALL)
 
 SETUP_JS = """
 function renderAllDjangoJSX(COMPONENTS) {
@@ -64,13 +64,13 @@ class Command(BaseCommand):
                     hash = hashlib.sha1(jsx).hexdigest()
                     jsx = jsx.strip()
                     jsx = re.sub(R_CTXVAR, r'\1__CTX__.\2\3', jsx)
-                    names = re.findall(R_NAME, jsx)
-                    name_statements = []
+                    components = set(re.findall(R_COMPONENT, jsx))
+                    component_statements = []
                     for name in names:
-                        name_statements.append("if (Object.hasOwnProperty.call(__COMPONENTS__, '%(name)s'))var {%(name)s} = __COMPONENTS__;" % locals())
-                    name_statements = ''.join(name_statements)
+                        component_statements.append("if (Object.hasOwnProperty.call(__COMPONENTS__, '%(name)s'))\n  var {%(name)s} = __COMPONENTS__;\n" % locals())
+                    component_statements = ''.join(component_statements)
 
-                    print('jsx_registry["%(hash)s"] = (__COMPONENTS__, __CTX__) => { %(name_statements)s; return %(jsx)s; }' % locals(), file=output)
+                    print('jsx_registry["%(hash)s"] = (__COMPONENTS__, __CTX__) => { %(component_statements)s; return (%(jsx)s); }' % locals(), file=output)
         print(SETUP_JS, file=output)
         print("jsx_registry.renderAllDjangoJSX = renderAllDjangoJSX;", file=output)
         print("export default jsx_registry;", file=output)
