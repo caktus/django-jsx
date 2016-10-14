@@ -1,0 +1,16 @@
+*.py[co]
+.project
+.pydevproject
+*~
+*.swp
+*.db
+*.orig
+*.DS_Store
+.coverage
+.tox
+*.egg-info/*
+docs/_build/*
+build
+dist/*
+*.mo
+node_modules/*
