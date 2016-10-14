@@ -66,8 +66,8 @@ class Command(BaseCommand):
                     jsx = re.sub(R_CTXVAR, r'\1__CTX__.\2\3', jsx)
                     components = set(re.findall(R_COMPONENT, jsx))
                     component_statements = []
-                    for name in names:
-                        component_statements.append("if (Object.hasOwnProperty.call(__COMPONENTS__, '%(name)s'))\n  var {%(name)s} = __COMPONENTS__;\n" % locals())
+                    for component in components:
+                        component_statements.append("if (Object.hasOwnProperty.call(__COMPONENTS__, '%(component)s'))\n  var {%(component)s} = __COMPONENTS__;\n" % locals())
                     component_statements = ''.join(component_statements)
 
                     print('jsx_registry["%(hash)s"] = (__COMPONENTS__, __CTX__) => { %(component_statements)s; return (%(jsx)s); }' % locals(), file=output)

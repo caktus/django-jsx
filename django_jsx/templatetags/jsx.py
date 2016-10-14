@@ -57,8 +57,6 @@ def pack_opportunistically(obj, path, expressions):
                     if callable(next_obj):
                         next_obj = next_obj()
                     packed[next_step] = pack_opportunistically(next_obj, path + [next_step], expressions)
-                    if next_step == 'form':
-                        assert False, packed
         return packed or None
 
 @register.tag
