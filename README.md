@@ -34,7 +34,7 @@ block easily.
 
     {% load jsx %}
     {% jsx %}
-        <Dropdown input="section" options={sectionOptions} />
+        <Dropdown input="section" options={ctx.sectionOptions} />
     {% endjsx %}
 
 You'll need to include Django-JSX into your front-end build process. This includes

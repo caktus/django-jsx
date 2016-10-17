@@ -6,8 +6,7 @@ from django import template
 from django.utils.html import escape
 from django.template.base import TOKEN_VAR, TOKEN_BLOCK
 
-
-R_CTXEXPR = re.compile(r'{([A-Za-z][\d\w\.]*)', re.DOTALL)
+R_CTXEXPR = re.compile(r'\.*ctx\.([A-Za-z][\d\w\.]*)')
 
 register = template.Library()
 
