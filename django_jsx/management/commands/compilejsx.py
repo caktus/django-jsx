@@ -20,7 +20,9 @@ function renderAllDjangoJSX(COMPONENTS) {
             let ctx = JSON.parse(el.dataset.ctx)
             let component = jsx_registry[el.dataset.sha1](COMPONENTS, ctx)
             ReactDOM.render(component, el)
-            el.replaceWith(el.children[0])
+            if (el.parentNode) {
+                el.parentNode.replaceChild(el.children[0], el)
+            }
         }
     )
 }
