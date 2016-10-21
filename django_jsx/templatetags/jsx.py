@@ -15,7 +15,8 @@ def serialize_opportunistically(obj, expressions):
         expression.split('.')
         for expression in expressions
     ]
-    return json.dumps(pack_opportunistically(obj, [], expressions))
+    packed = pack_opportunistically(obj, [], expressions)
+    return json.dumps(packed)
 
 def pack_opportunistically(obj, path, expressions):
     if isinstance(obj, (tuple, list)):
@@ -26,10 +27,11 @@ def pack_opportunistically(obj, path, expressions):
     elif isinstance(obj, template.Context):
         return pack_opportunistically(obj.flatten(), path, expressions)
     elif isinstance(obj, dict):
-        return dict(
-            (k, pack_opportunistically(obj[k], path + [k], expressions))
-            for k in obj
-        )
+        packed_dict = {}
+        for k in obj:
+            if isinstance(k, basestring):
+                packed_dict[k] = pack_opportunistically(obj[k], path + [k], expressions)
+        return packed_dict
     elif isinstance(obj, (float, int, basestring)):
         return obj
     else:
