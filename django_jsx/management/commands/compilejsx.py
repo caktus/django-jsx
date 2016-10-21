@@ -15,11 +15,14 @@ R_CTXVAR = re.compile(r'({)([A-Za-z]\w?)(\.?)', re.DOTALL)
 SETUP_JS = """
 function renderAllDjangoJSX(COMPONENTS) {
     Array.prototype.forEach.call(
-        document.querySelectorAll('script[type^=script][type$=django-jsx]'), function(el) {
+        document.querySelectorAll('script[type^=script][type$=django-jsx]'),
+        function(el) {
             let ctx = JSON.parse(el.dataset.ctx)
             let component = jsx_registry[el.dataset.sha1](COMPONENTS, ctx)
             ReactDOM.render(component, el)
-            el.replaceWith(el.children[0])
+            if (el.parentNode) {
+                el.parentNode.replaceChild(el.children[0], el)
+            }
         }
     )
 }
@@ -63,14 +66,14 @@ class Command(BaseCommand):
                 for jsx in jsx_blocks:
                     hash = hashlib.sha1(jsx).hexdigest()
                     jsx = jsx.strip()
-                    jsx = re.sub(R_CTXVAR, r'\1__CTX__.\2\3', jsx)
                     components = set(re.findall(R_COMPONENT, jsx))
                     component_statements = []
-                    for name in names:
-                        component_statements.append("if (Object.hasOwnProperty.call(__COMPONENTS__, '%(name)s'))\n  var {%(name)s} = __COMPONENTS__;\n" % locals())
+                    for component in components:
+                        component_statements.append("if (Object.hasOwnProperty.call(COMPONENTS, '%(component)s'))\n  var {%(component)s} = COMPONENTS;\n" % locals())
+                    component_statements.append('return (%(jsx)s);' % locals())
                     component_statements = ''.join(component_statements)
 
-                    print('jsx_registry["%(hash)s"] = (__COMPONENTS__, __CTX__) => { %(component_statements)s; return (%(jsx)s); }' % locals(), file=output)
+                    print('jsx_registry["%(hash)s"] = (COMPONENTS, ctx) => { %(component_statements)s }' % locals(), file=output)
         print(SETUP_JS, file=output)
         print("jsx_registry.renderAllDjangoJSX = renderAllDjangoJSX;", file=output)
         print("export default jsx_registry;", file=output)
