@@ -1,6 +1,8 @@
-# CircleCI doesn't like Python 3.4.5...
+# CircleCI doesn't like Python 3.4.5... or 3.4.2, even though they show it
+# in the example in their docs
+# OKAY list of what they have is at https://circleci.com/docs/build-image-trusty/#python
 machine:
   post:
-    - pyenv global 2.7.12 3.4.2 3.5.2 3.6.0
+    - pyenv global 2.7.12 3.4.4 3.5.2 3.6.0
 
 # docs say that if CircleCI sees a tox.ini file, it'll run tox
