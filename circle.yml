@@ -1,0 +1,5 @@
+machine:
+  post:
+    - pyenv global 2.7 3.5 3.6
+
+# docs say that if CircleCI sees a tox.ini file, it'll run tox
