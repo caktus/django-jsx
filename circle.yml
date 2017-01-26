@@ -1,5 +1,6 @@
+# CircleCI doesn't like Python 3.4.5...
 machine:
   post:
-    - pyenv global 2.7.12 3.4.5 3.5.2 3.6.0
+    - pyenv global 2.7.12 3.4.2 3.5.2 3.6.0
 
 # docs say that if CircleCI sees a tox.ini file, it'll run tox
