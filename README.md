@@ -59,6 +59,23 @@ the process.
     })
 
 
+## How it works
+
+* The `compilejsx` management command finds all the `jsx` blocks in the project's templates. It
+  creates a jsx_registry.js file which has a snippet of javascript for
+  each JSX block, . It also defines a `renderAllDjangoJSX` function.
+  
+* Include the output file from `compilejsx` when bundling your JavaScript. It uses
+  ECMAScript 2015 features and so might need some transpiling.
+
+* When rendered, the `jsx` template tag is replaced by an empty script tag, whose purpose
+  is to store (as a data attribute) a snapshot of the contents of the template context
+  at that point in the template.
+
+* At load time in a page with jsx tags, the page should call `renderAllDjangoJSX`. It will 
+  iterate over all the `jsx` script tags in the page's HTML, and render the appropriate
+  React component into each one using the template context.
+
 
 ## License
 

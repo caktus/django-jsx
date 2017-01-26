@@ -1,0 +1,7 @@
+[run]
+branch = true
+omit = */tests/*, .tox/*, runtests.py, setup.py
+source = .
+
+[report]
+show_missing = true
