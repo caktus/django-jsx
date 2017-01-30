@@ -1,4 +1,4 @@
-# django-jsx
+# django-jsx [![CircleCI](https://circleci.com/gh/caktus/django-jsx.svg?style=svg)](https://circleci.com/gh/caktus/django-jsx)
 
 Django-JSX is a integration tool for Django projects using the excellent React
 UI library. It enables direct embedding of the JSX syntax into Django templates
