@@ -29,7 +29,8 @@ def set_nested(dictionary, key, value):
         # part of the key is a dictionary, then set the value
         # into that dictionary using the key with the first part
         # stripped off.
-        dictionary.setdefault(elts[0], {})
+        if not isinstance(dictionary.get(elts[0], None), dict):
+            dictionary[elts[0]] = {}
         new_key = '.'.join(elts[1:])
         set_nested(dictionary[elts[0]], new_key, value)
 
