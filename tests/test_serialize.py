@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 import json
 
 from django.template import Context
-from django.template import VariableDoesNotExist
 from django.test import TestCase
 
 from django_jsx.templatetags.jsx import serialize_opportunistically
@@ -31,12 +30,24 @@ class SerializeOpportunisticallyTest(TestCase):
         }
         self.assertEqual(expect, json.loads(result))
 
-    def test_bad_reference(self):
-        # If we refer to something not in the context, we get a meaningful exception
-        with self.assertRaises(VariableDoesNotExist) as raise_context:
-            serialize_opportunistically({}, ['no.such.variable'])
-            exc = raise_context.exc
-            self.assertIn("there's no variable no.such.variable", str(exc))
+    def test_missing_variable(self):
+        """
+        In Django templates, if a variable is not defined in the context, then
+        Django sets that variable to the special value ``string_if_invalid``
+        which is normally the empty string, but is customizable in Django
+        settings TEMPLATES['OPTIONS']['string_if_invalid']. Django doesn't
+        raise a user-visible error, so we should do the same thing in
+        django_jsx.
+        """
+        result = serialize_opportunistically(Context(), ['no.such.variable'])
+        expect = {
+            'no': {
+                'such': {
+                    'variable': ''
+                }
+            }
+        }
+        self.assertEqual(expect, json.loads(result))
 
     def test_nested_expressions(self):
         obj = {
