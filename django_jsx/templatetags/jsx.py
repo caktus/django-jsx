@@ -24,14 +24,21 @@ def set_nested(dictionary, key, value):
     """
     elts = key.split('.')
     if len(elts) == 1:
-        # Simple key, just set the value in the dictionary
-        dictionary[elts[0]] = value
+        # Simple key, just set the value in the dictionary ...
+        if elts[0] not in dictionary:
+            # ... but only if the key is not already there.
+            dictionary[elts[0]] = value
     else:
         # Dotted key. Need to make sure the item with the first
         # part of the key is a dictionary, then set the value
         # into that dictionary using the key with the first part
         # stripped off.
+
         if not isinstance(dictionary.get(elts[0], None), dict):
+            # Either top level expression is not yet in the dictionary, or it
+            # is there, but it is not itself a dictionary. It must be a
+            # dictionary so we can put our nested value inside of it, so set
+            # it to a dictionary.
             dictionary[elts[0]] = {}
         new_key = '.'.join(elts[1:])
         set_nested(dictionary[elts[0]], new_key, value)

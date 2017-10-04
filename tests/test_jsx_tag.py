@@ -58,6 +58,13 @@ class SetNestedTest(TestCase):
         set_nested(d, 'foo.bar', 3)
         self.assertEqual({'foo': {'bar': 3}}, d)
 
+    def test_top_level_item_doesnt_clobber_nested(self):
+        # foo.bar has previously been set
+        d = {'foo': {'bar': 3}}
+        # if we later try to set foo, we shouldn't clobber foo.bar
+        set_nested(d, 'foo', object())
+        self.assertEqual({'foo': {'bar': 3}}, d)
+
 
 class JsxTagTest(TestCase):
     def test_loading_tags(self):
