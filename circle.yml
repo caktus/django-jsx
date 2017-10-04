@@ -1,6 +1,6 @@
 # A list of CircleCI's Python versions is at https://circleci.com/docs/build-image-trusty/#python
 machine:
   post:
-    - pyenv global 2.7.12 3.4.4 3.5.2 3.6.0
+    - pyenv global 2.7.12 3.4.4 3.5.3 3.6.2
 
 # If CircleCI sees a tox.ini file, it'll run tox, so nothing is needed here.
