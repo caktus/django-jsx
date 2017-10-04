@@ -1,6 +1,7 @@
 import re
 import json
 from hashlib import sha1
+import logging
 
 from django import template
 from django.template import TemplateSyntaxError
@@ -11,6 +12,7 @@ from django.template.base import TOKEN_VAR, TOKEN_BLOCK, Variable, VariableDoesN
 # and look like "ctx.foo.bar" or "ctx.3.xyz" etc.
 R_CTXEXPR = re.compile(r'\.*ctx\.([A-Za-z][\d\w\.]*)')
 
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -48,11 +50,18 @@ def serialize_opportunistically(context, expressions):
         try:
             value = Variable(expression).resolve(context)
         except VariableDoesNotExist:
-            raise VariableDoesNotExist(
-                "JSX block refers to ctx.%s, but there's no variable %s "
-                "in the Django template context." % (expression, expression))
-        else:
-            set_nested(ctx, expression, value)
+            logger.debug(
+                "JSX block refers to ctx.%s, but there's no variable by that name "
+                "in the Django template context.", expression)
+            if context.template:
+                string_if_invalid = context.template.engine.string_if_invalid
+            else:
+                string_if_invalid = ''
+            if '%s' in string_if_invalid:
+                value = string_if_invalid % expression
+            else:
+                value = string_if_invalid
+        set_nested(ctx, expression, value)
     ctx = json.dumps(ctx)
     return ctx
 

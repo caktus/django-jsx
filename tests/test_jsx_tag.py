@@ -113,6 +113,21 @@ class JsxTagTest(TestCase):
         expected_ctx = {'list': {'0': 1}}
         self.try_it(content, expected_ctx, context=context)
 
+    def test_missing_variables(self):
+        "If variable is missing, set it to empty string (by default)."
+        content = '''<Component prop2={ctx.does.not.exist}/>'''
+        context = {}
+        expected_ctx = {'does': {'not': {'exist': ''}}}
+        self.try_it(content, expected_ctx, context=context)
+
+    def test_missing_variables_with_string_if_invalid_set(self):
+        "If variable is missing, use Engine's string_if_invalid value."
+        ENGINE.string_if_invalid = 'hey, missing var -> %s'
+        content = '''<Component prop2={ctx.does.not.exist}/>'''
+        context = {}
+        expected_ctx = {'does': {'not': {'exist': 'hey, missing var -> does.not.exist'}}}
+        self.try_it(content, expected_ctx, context=context)
+
     # SHOULD NOT BE ALLOWED - compilejsx will reject
     # def test_two_identical_blocks_with_different_contexts(self):
     #     # If an identical block is repeated with different context values, we
