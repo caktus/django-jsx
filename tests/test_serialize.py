@@ -78,6 +78,26 @@ class SerializeOpportunisticallyTest(TestCase):
         }
         self.assertEqual(expect, json.loads(result))
 
+    def test_top_level_object_doesnt_clobber_nested_expressions(self):
+        # create an object with some attributes
+        class Location(dict):
+            full_name = 'New York'
+        location = Location()
+
+        # the order of expressions is important here
+        expressions = [
+            'location.full_name',  # set up the nested dict
+            'location',            # this should not clobber the nested dict
+        ]
+        obj = {'location': location}
+        result = serialize_opportunistically(Context(obj), expressions)
+        expect = {
+            'location': {
+                'full_name': 'New York',
+            }
+        }
+        self.assertEqual(expect, json.loads(result))
+
     def test_with_callable(self):
         def call1():
             return "called 1"
