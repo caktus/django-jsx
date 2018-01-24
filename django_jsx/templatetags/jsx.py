@@ -1,6 +1,7 @@
 import re
 import json
 from hashlib import sha1
+import logging
 
 from django import template
 from django.template import TemplateSyntaxError
@@ -11,6 +12,7 @@ from django.template.base import TOKEN_VAR, TOKEN_BLOCK, Variable, VariableDoesN
 # and look like "ctx.foo.bar" or "ctx.3.xyz" etc.
 R_CTXEXPR = re.compile(r'\.*ctx\.([A-Za-z][\d\w\.]*)')
 
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -22,14 +24,22 @@ def set_nested(dictionary, key, value):
     """
     elts = key.split('.')
     if len(elts) == 1:
-        # Simple key, just set the value in the dictionary
-        dictionary[elts[0]] = value
+        # Simple key, just set the value in the dictionary ...
+        if elts[0] not in dictionary:
+            # ... but only if the key is not already there.
+            dictionary[elts[0]] = value
     else:
         # Dotted key. Need to make sure the item with the first
         # part of the key is a dictionary, then set the value
         # into that dictionary using the key with the first part
         # stripped off.
-        dictionary.setdefault(elts[0], {})
+
+        if not isinstance(dictionary.get(elts[0], None), dict):
+            # Either top level expression is not yet in the dictionary, or it
+            # is there, but it is not itself a dictionary. It must be a
+            # dictionary so we can put our nested value inside of it, so set
+            # it to a dictionary.
+            dictionary[elts[0]] = {}
         new_key = '.'.join(elts[1:])
         set_nested(dictionary[elts[0]], new_key, value)
 
@@ -47,11 +57,18 @@ def serialize_opportunistically(context, expressions):
         try:
             value = Variable(expression).resolve(context)
         except VariableDoesNotExist:
-            raise VariableDoesNotExist(
-                "JSX block refers to ctx.%s, but there's no variable %s "
-                "in the Django template context." % (expression, expression))
-        else:
-            set_nested(ctx, expression, value)
+            logger.debug(
+                "JSX block refers to ctx.%s, but there's no variable by that name "
+                "in the Django template context.", expression)
+            if context.template:
+                string_if_invalid = context.template.engine.string_if_invalid
+            else:
+                string_if_invalid = ''
+            if '%s' in string_if_invalid:
+                value = string_if_invalid % expression
+            else:
+                value = string_if_invalid
+        set_nested(ctx, expression, value)
     ctx = json.dumps(ctx)
     return ctx
 

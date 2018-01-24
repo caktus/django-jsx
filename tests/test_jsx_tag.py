@@ -49,6 +49,22 @@ class SetNestedTest(TestCase):
         set_nested(d, 'foo.bar', 3)
         self.assertEqual({'one': 1, 'foo': {'bar': 3, 'baz': 2}}, d)
 
+    def test_with_existing_object(self):
+        """
+        If a top level item to be serialized is an object, we shouldn't fail at
+        trying to set the lower level item.
+        """
+        d = {'foo': object()}
+        set_nested(d, 'foo.bar', 3)
+        self.assertEqual({'foo': {'bar': 3}}, d)
+
+    def test_top_level_item_doesnt_clobber_nested(self):
+        # foo.bar has previously been set
+        d = {'foo': {'bar': 3}}
+        # if we later try to set foo, we shouldn't clobber foo.bar
+        set_nested(d, 'foo', object())
+        self.assertEqual({'foo': {'bar': 3}}, d)
+
 
 class JsxTagTest(TestCase):
     def test_loading_tags(self):
@@ -102,6 +118,21 @@ class JsxTagTest(TestCase):
         content = '''<Component prop2={ctx.list.0}/>'''
         context = {'list': [1, 2, 3]}
         expected_ctx = {'list': {'0': 1}}
+        self.try_it(content, expected_ctx, context=context)
+
+    def test_missing_variables(self):
+        "If variable is missing, set it to empty string (by default)."
+        content = '''<Component prop2={ctx.does.not.exist}/>'''
+        context = {}
+        expected_ctx = {'does': {'not': {'exist': ''}}}
+        self.try_it(content, expected_ctx, context=context)
+
+    def test_missing_variables_with_string_if_invalid_set(self):
+        "If variable is missing, use Engine's string_if_invalid value."
+        ENGINE.string_if_invalid = 'hey, missing var -> %s'
+        content = '''<Component prop2={ctx.does.not.exist}/>'''
+        context = {}
+        expected_ctx = {'does': {'not': {'exist': 'hey, missing var -> does.not.exist'}}}
         self.try_it(content, expected_ctx, context=context)
 
     # SHOULD NOT BE ALLOWED - compilejsx will reject

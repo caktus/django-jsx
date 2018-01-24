@@ -1,4 +1,4 @@
-# django-jsx
+# django-jsx [![CircleCI](https://circleci.com/gh/caktus/django-jsx.svg?style=svg)](https://circleci.com/gh/caktus/django-jsx)
 
 Django-JSX is a integration tool for Django projects using the excellent React
 UI library. It enables direct embedding of the JSX syntax into Django templates
@@ -16,7 +16,7 @@ Django-JSX makes React and Django work together.
 
 ## Installation and Use
 
-django-jsx requires Django >= 1.8 and Python >= 2.7 or >= 3.3.
+django-jsx requires Django >= 1.8 and Python >= 2.7 or >= 3.4.
 
 To install from PyPi:
 
@@ -63,9 +63,9 @@ the process.
 
 * The `compilejsx` management command finds all the `jsx` blocks in the project's templates. It
   creates a jsx_registry.js file which has a snippet of javascript for
-  each JSX block, which when called, will render the JSX. 
+  each JSX block, which when called, will render the JSX.
   It also defines a `renderAllDjangoJSX` function which will do that for a given page.
-  
+
 * Include the output file from `compilejsx` when bundling your JavaScript. It uses
   ECMAScript 2015 features and so might need some transpiling.
 
@@ -73,7 +73,7 @@ the process.
   is to store (as a data attribute) a snapshot of the contents of the template context
   at that point in the template.
 
-* At load time in a page with jsx tags, the page should call `renderAllDjangoJSX`. It will 
+* At load time in a page with jsx tags, the page should call `renderAllDjangoJSX`. It will
   iterate over all the `jsx` script tags in the page's HTML, and render the appropriate
   React component into each one using the template context from the script tag and the Javascript
   compiled from the original JSX.
