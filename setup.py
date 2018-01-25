@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-jsx',
-    version='0.3.0',
+    version='0.4.0',
     author='Calvin Spealman',
     author_email='calvin@caktusgroup.com',
     packages=find_packages(exclude=['sample_project']),

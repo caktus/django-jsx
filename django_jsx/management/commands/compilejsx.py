@@ -29,10 +29,12 @@ function renderAllDjangoJSX(COMPONENTS) {
         function(el) {
             let ctx = JSON.parse(el.dataset.ctx)
             let component = jsx_registry[el.dataset.sha1](COMPONENTS, ctx)
-            ReactDOM.render(component, el)
-            if (el.parentNode) {
-                el.parentNode.replaceChild(el.children[0], el)
-            }
+            el.insertAdjacentHTML("afterend", "<span></span>")
+
+            ReactDOM.render(component, el.nextSibling)
+
+            el.parentNode.replaceChild(el.nextSibling.children[0], el.nextSibling)
+            el.parentNode.removeChild(el)
         }
     )
 }
