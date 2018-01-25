@@ -34,12 +34,12 @@ function renderAllDjangoJSX(COMPONENTS) {
             let ctx = JSON.parse(el.dataset.ctx)
             let component = jsx_registry[el.dataset.sha1](COMPONENTS, ctx)
 
-            // Actuall render and place the component into the pgae:
+            // Actually render and place the component into the pgae:
             // 1) Create a placeholder to render the component into
             // 2) Render the component into the placeholder
             // 3) Replace the placeholder with the actual component
             // 4) Remove the <script> hook to clean up
-            
+
             el.insertAdjacentHTML("afterend", "<span></span>")
 
             ReactDOM.render(component, el.nextSibling)
