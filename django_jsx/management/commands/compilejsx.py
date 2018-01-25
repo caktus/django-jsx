@@ -25,10 +25,21 @@ var jsx_registry = {};
 END_JS = """
 function renderAllDjangoJSX(COMPONENTS) {
     Array.prototype.forEach.call(
+        // Find all "django-jsx" scripts which are hooks to render and inject react components
         document.querySelectorAll('script[type^=script][type$=django-jsx]'),
         function(el) {
+
+            // Extract serialized context data for rendering the component and get the component
+            // from our database
             let ctx = JSON.parse(el.dataset.ctx)
             let component = jsx_registry[el.dataset.sha1](COMPONENTS, ctx)
+
+            // Actuall render and place the component into the pgae:
+            // 1) Create a placeholder to render the component into
+            // 2) Render the component into the placeholder
+            // 3) Replace the placeholder with the actual component
+            // 4) Remove the <script> hook to clean up
+            
             el.insertAdjacentHTML("afterend", "<span></span>")
 
             ReactDOM.render(component, el.nextSibling)
