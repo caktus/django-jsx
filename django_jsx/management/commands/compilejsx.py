@@ -4,6 +4,7 @@ import os
 import re
 import hashlib
 
+from django.apps import apps
 import django.template
 from django.template.backends.django import DjangoTemplates
 from django.core.management.base import BaseCommand
@@ -44,8 +45,8 @@ function renderAllDjangoJSX(COMPONENTS) {
 
             ReactDOM.render(component, el.nextSibling)
 
-            el.parentNode.replaceChild(el.nextSibling.children[0], el.nextSibling)
-            el.parentNode.removeChild(el)
+            //el.parentNode.replaceChild(el.nextSibling.children[0], el.nextSibling)
+            //el.parentNode.removeChild(el)
         }
     )
 }
@@ -95,6 +96,13 @@ def list_template_files():
         for dir, dirnames, filenames in os.walk(each):
             for filename in filenames:
                 template_list.append(os.path.join(dir, filename))
+
+    for appname, app in apps.app_configs.items():
+        app_dir = os.path.dirname(app.module.__file__)
+        for dir, dirnames, filenames in os.walk(os.path.join(app_dir, "templates")):
+            for filename in filenames:
+                template_list.append(os.path.join(dir, filename))
+
     return template_list
 
 
@@ -112,7 +120,7 @@ def compile_templates(template_list, output=None):
         first = True
         try:
             content = open(template).read()
-        except IOError:
+        except (IOError, UnicodeDecodeError):
             pass
         else:
             jsx_blocks = re.findall(R_JSX, content)
