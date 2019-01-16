@@ -75,7 +75,7 @@ class TemplateFindingTest(TestCase):
         )
 
     @override_settings(
-        INSTALLED_APPS=['test'],
+        INSTALLED_APPS=['tests'],
         TEMPLATES=[
             {
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
