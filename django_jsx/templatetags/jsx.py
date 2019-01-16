@@ -3,10 +3,17 @@ import json
 from hashlib import sha1
 import logging
 
-from django import template
+from django import template, VERSION as dj_version
 from django.template import TemplateSyntaxError
 from django.utils.html import escape
-from django.template.base import TOKEN_VAR, TOKEN_BLOCK, Variable, VariableDoesNotExist
+from django.template.base import Variable, VariableDoesNotExist
+
+if dj_version[:2] >= (2, 1):
+    from django.template.base import TokenType
+    TOKEN_VAR = TokenType.VAR
+    TOKEN_BLOCK = TokenType.BLOCK
+else:
+    from django.template.base import TOKEN_VAR, TOKEN_BLOCK
 
 # Regex to find references to context that start with "ctx."
 # and look like "ctx.foo.bar" or "ctx.3.xyz" etc.
