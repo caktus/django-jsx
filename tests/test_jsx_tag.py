@@ -175,16 +175,26 @@ class JsxTagTest(TestCase):
             .replace('SHA1', sha1))
         self.assertEqual(expected_output, unescape(result))
 
-    def test_nested_blocks(self):
-        # Nested JSX blocks are not allowed
+    def test_django_var(self):
+        # Django variables are not allowed
         test_content = '''
         {% load jsx %}
         {% jsx %}
-            <Component1>
-                {% jsx %}<Component2/>{% endjsx %}
-            </Component1>
+          {{ my_var }}
         {% endjsx %}'''
         with self.assertRaises(TemplateSyntaxError) as raise_context:
             self.try_it(test_content, None, raw=True,)
-            exc = raise_context.exc
-            self.assertIn('jsx blocks cannot be nested in a template', str(exc))
+        exc = raise_context.exception
+        self.assertIn('jsx blocks cannot contain Django Template syntax', str(exc))
+
+    def test_django_block(self):
+        # Django blocks are not allowed
+        test_content = '''
+        {% load jsx %}
+        {% jsx %}
+          {% if is_true %}{% endif %}
+        {% endjsx %}'''
+        with self.assertRaises(TemplateSyntaxError) as raise_context:
+            self.try_it(test_content, None, raw=True,)
+        exc = raise_context.exception
+        self.assertIn('jsx blocks cannot contain Django Template syntax', str(exc))

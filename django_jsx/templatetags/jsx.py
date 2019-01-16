@@ -8,12 +8,11 @@ from django.template import TemplateSyntaxError
 from django.utils.html import escape
 from django.template.base import Variable, VariableDoesNotExist
 
-if dj_version[:2] >= (2, 1):
+if dj_version[:2] >= (2, 1):  # pragma: nocover
     from django.template.base import TokenType
-    TOKEN_VAR = TokenType.VAR
-    TOKEN_BLOCK = TokenType.BLOCK
+    TOKEN_TEXT = TokenType.TEXT
 else:
-    from django.template.base import TOKEN_VAR, TOKEN_BLOCK
+    from django.template.base import TOKEN_TEXT
 
 # Regex to find references to context that start with "ctx."
 # and look like "ctx.foo.bar" or "ctx.3.xyz" etc.
@@ -118,20 +117,10 @@ def jsx(parser, token):
         if token.contents == 'endjsx':
             break
 
-        if token.contents == 'jsx':
-            raise TemplateSyntaxError("jsx blocks cannot be nested in a template")
-
-        if token.token_type == TOKEN_VAR:
-            text.append('{{')
-        elif token.token_type == TOKEN_BLOCK:
-            text.append('{%')
+        if token.token_type != TOKEN_TEXT:
+            raise TemplateSyntaxError("jsx blocks cannot contain Django Template syntax.")
 
         text.append(token.contents)
-
-        if token.token_type == TOKEN_VAR:
-            text.append('}}')
-        elif token.token_type == TOKEN_BLOCK:
-            text.append('%}')
 
     return JsxNode(''.join(text))
 

@@ -78,6 +78,11 @@ the process.
   React component into each one using the template context from the script tag and the Javascript
   compiled from the original JSX.
 
+## Notes
+
+* `jsx` blocks cannot contain other `jsx` blocks, or other Django template features such as block
+  tags or context variables.
+
 ## License
 
 django-jsx is released under the BSD License. See the
