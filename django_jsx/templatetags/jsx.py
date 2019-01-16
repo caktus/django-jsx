@@ -10,8 +10,8 @@ from django.template.base import Variable, VariableDoesNotExist
 
 if dj_version[:2] >= (2, 1):
     from django.template.base import TokenType
-    TOKEN_VAR = TokenType.VAR.value
-    TOKEN_BLOCK = TokenType.BLOCK.value
+    TOKEN_VAR = TokenType.VAR
+    TOKEN_BLOCK = TokenType.BLOCK
 else:
     from django.template.base import TOKEN_VAR, TOKEN_BLOCK
 
