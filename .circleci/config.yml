@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/app
+    docker:
+      # https://discuss.circleci.com/t/testing-in-different-environments/450/13
+      - image: themattrix/tox
+    steps:
+      - checkout
+      - restore_cache:
+          key: tox-v1-{{ checksum "tox.ini" }}-{{ checksum "setup.py" }}
+      - run: tox
+      - save_cache:
+          key: tox-v1-{{ checksum "tox.ini" }}-{{ checksum "setup.py" }}
+          paths:
+            - ~/app/.tox
